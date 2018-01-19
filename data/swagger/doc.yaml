@@ -1,0 +1,49 @@
+swagger: "2.0"
+info:
+  description: "REST API with Swagger"
+  version: "1.0.0"
+  title: "REST - Swagger MMP-Extension"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "info@clinbioinfosspa.es"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:3000"
+basePath: "/api"
+tags:
+- name: "auth"
+  description: "Auth endpoints"
+schemes:
+- "http"
+paths:
+  /auth/login:
+    post:
+      description: "Lofgin to the application"
+      tags:
+      - "auth"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "email"
+        description: "Email to use for login."
+        in: "formData"
+        required: true
+        type: "string"
+      - name: "password"
+        description: "User's password."
+        in: "formData"
+        required: true
+        type: "string"
+        format: "password"
+      responses:
+         200:
+           description: "login"
+  /ping:
+    get:
+      description: "Testing Endpoint"
+      produces:
+      - application/json
+      responses:
+        200:
+          description: "Return an ok when endpoint works"
