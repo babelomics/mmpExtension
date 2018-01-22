@@ -14,6 +14,10 @@ basePath: "/api"
 tags:
 - name: "auth"
   description: "Auth endpoints"
+- name: "panel"
+  description: "Panel endpoints"
+- name: "gene"
+  description: "Gene endpoints"
 schemes:
 - "http"
 paths:
@@ -39,6 +43,36 @@ paths:
       responses:
          200:
            description: "login"
+  /panel/readFromXls:
+    get:
+        description: "Read panels from xls file"
+        tags:
+        - "panel"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Read panel from xls"
+  /gene/count:
+    get:
+        description: "Count genes from model"
+        tags:
+        - "gene"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Counted genes"
+  /gene/readFromXls:
+    get:
+        description: "Read genes from xls file"
+        tags:
+        - "gene"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Read gene from xls"
   /ping:
     get:
       description: "Testing Endpoint"
