@@ -43,6 +43,16 @@ paths:
       responses:
          200:
            description: "login"
+  /panel/count:
+    get:
+        description: "Count panel from model"
+        tags:
+        - "panel"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Counted panels"
   /panel/readFromXls:
     get:
         description: "Read panels from xls file"
@@ -68,6 +78,12 @@ paths:
         description: "Read genes from xls file"
         tags:
         - "gene"
+        parameters:
+        - name: "pathFile"
+          description: "Path where is xls file."
+          in: "query"
+          required: true
+          type: "string"
         produces:
         - "application/json"
         responses:
