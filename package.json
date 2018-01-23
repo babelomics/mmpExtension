@@ -24,8 +24,17 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "async": "^2.6.0",
     "eslint": "^4.15.0",
     "eslint-config-google": "^0.9.1",
-    "eslint-plugin-import": "^2.8.0"
+    "eslint-plugin-import": "^2.8.0",
+    "xlsx": "^0.11.17"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "data/files/*",
+      "docs/*"
+    ],
+    "delay": "2500"
   }
 }
