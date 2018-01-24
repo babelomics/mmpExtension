@@ -5,13 +5,14 @@ const Schema = mongoose.Schema;
 // ================================
 const PanelSchema = new Schema(
   {
-    name: {
+    internalId: {
       type: String,
       unique: true,
-      required: true,
+      unique: true,
     },
-    creatorName: {
+    name: {
       type: String,
+      required: true,
     },
     genes: [{type: Schema.Types.ObjectId, ref: 'Gene'}],
     variants: [],
@@ -19,6 +20,9 @@ const PanelSchema = new Schema(
       type: String,
     },
     privateComment: {
+      type: String,
+    },
+    adverseComment: {
       type: String,
     },
     version: {
@@ -33,12 +37,14 @@ const PanelSchema = new Schema(
   }
 );
 
-// name setter
-PanelSchema.path('name').set((v) => {
-  return capitalize(v);
-});
+// // name setter
+// PanelSchema.path('name').set((v) => {
+//   return capitalize(v);
+// });
 
 // Pre-save of Panel to database
-PanelSchema.pre('save', function(next) {});
+PanelSchema.pre('save', function(next) {
+  next();
+});
 
 module.exports = mongoose.model('Panel', PanelSchema);
