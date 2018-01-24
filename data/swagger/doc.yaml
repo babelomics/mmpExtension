@@ -58,6 +58,12 @@ paths:
         description: "Read panels from xls file"
         tags:
         - "panel"
+        parameters:
+        - name: "pathFile"
+          description: "Path where is xls file."
+          in: "query"
+          required: true
+          type: "string"
         produces:
         - "application/json"
         responses:
