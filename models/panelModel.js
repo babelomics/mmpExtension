@@ -8,7 +8,6 @@ const PanelSchema = new Schema(
     internalId: {
       type: String,
       unique: true,
-      unique: true,
     },
     name: {
       type: String,
@@ -36,6 +35,8 @@ const PanelSchema = new Schema(
     timestamps: true,
   }
 );
+
+PanelSchema.index({name: 'text'});
 
 // // name setter
 // PanelSchema.path('name').set((v) => {

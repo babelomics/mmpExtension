@@ -69,6 +69,27 @@ paths:
         responses:
           200:
             description: "Read panel from xls"
+  /panel/searchPanel:
+    get:
+        description: "Search panels by name"
+        tags:
+        - "panel"
+        parameters:
+        - name: "query"
+          description: "name panel which want search."
+          in: "query"
+          required: true
+          type: "string"
+        - name: "limit"
+          description: "Max num results returned"
+          in: "query"
+          required: true
+          type: "integer"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Read panel from xls"
   /gene/count:
     get:
         description: "Count genes from model"

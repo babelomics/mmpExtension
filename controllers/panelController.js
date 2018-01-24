@@ -255,3 +255,48 @@ function createPanelcategory(
     return responsePromise;
   }
 }
+
+exports.searchPanel = function(req, res, next) {
+  let query = req.query.query;
+  let limit = req.query.limit;
+
+  console.log(query);
+  if (query === null || query === '') {
+    res.status(200).json(
+      new ResponseMMP().responseError({
+        code: 0,
+        message: 'Query is required',
+      })
+    );
+    return;
+  }
+  if (limit === null || limit === '') {
+    res.status(200).json(
+      new ResponseMMP().responseError({
+        code: 0,
+        message: 'limit is required',
+      })
+    );
+    return;
+  }
+  limit = parseInt(limit);
+  if (isNaN(limit)) {
+    res.status(200).json(
+      new ResponseMMP().responseError({
+        code: 0,
+        message: 'limit must be a number',
+      })
+    );
+    return;
+  }
+
+  console.log(query);
+
+  Panel.find({$text: {$search: query}})
+    .limit(limit)
+    .exec()
+    .then((respnse) => {
+      console.log(respnse);
+      res.status(200).json(new ResponseMMP().response(respnse));
+    });
+};
