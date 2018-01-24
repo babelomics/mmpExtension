@@ -34,21 +34,20 @@ exports.readFromXls = function(req, res, next) {
     jsonXSLX,
     function(row, callback) {
       count++;
-      if (count > 2300) {
-        // notSaves.push(count + ': ' + name);
-        setImmediate(callback);
-      } else {
-        createPanel(row, myMap, count, panelCreates, panelUpdates).then(
-          (response) => {
-            if (response.break) {
-              response.status = 422;
-              callback(response);
-            } else {
-              setImmediate(callback);
-            }
+      // if (count > 2300) {
+      //   setImmediate(callback);
+      // } else {
+      createPanel(row, myMap, count, panelCreates, panelUpdates).then(
+        (response) => {
+          if (response.break) {
+            response.status = 422;
+            callback(response);
+          } else {
+            setImmediate(callback);
           }
-        );
-      }
+        }
+      );
+      // }
     },
     // }
     function(err) {
@@ -70,14 +69,13 @@ exports.readFromXls = function(req, res, next) {
 
 /**
  *
- * @param {*} row
+ * Create each category depends of its hierarchy
  * @param {*} myMap
+ * @param {*} count
+ * @param {*} panelCreates
+ * @param {*} panelUpdates
  */
 function createPanel(row, myMap, count, panelCreates, panelUpdates) {
-  // console.log(
-  //   count + 'llegandoa  create panel: ' + JSON.stringify(row) + ':' + gene
-  // );
-
   let categoria = row.Categoria;
   let subcategoria1 = row.Subcategoria1;
   let subcategoria2 = row.Subcategoria2;
@@ -135,20 +133,16 @@ function createPanel(row, myMap, count, panelCreates, panelUpdates) {
         return response;
       });
   }
-  //
-  // console.log(count + ': ' + JSON.stringify(row) + ': ' + name);
-
-  // if (count > 5000) {
-  //   notSaves.push(count + ': ' + name);
-  //   setImmediate(callback);
-  // } else {
 }
 
 /**
- *
+ * We create or update every panel with its corresponding genes
  * @param {*} row
  * @param {*} categoria
  * @param {*} myMap
+ * @param {*} depth
+ * @param {*} panelCreates
+ * @param {*} panelUpdates
  */
 function createPanelcategory(
   row,
@@ -198,13 +192,14 @@ function createPanelcategory(
       .exec()
       .then((existingGene) => {
         console.log('existing gene: ' + gene);
-        // If !exist gene
+        // If !exist gene return error
         if (!existingGene) {
           console.log('Not found gene' + name);
           responsePromise.msg = 'Not found gene: ' + gene;
           responsePromise.break = true;
           return responsePromise;
         } else {
+          // If exists gene we find for panel
           geneObject = existingGene;
           return Panel.findOne(
             {internalId: idCategoria},
@@ -213,6 +208,7 @@ function createPanelcategory(
         }
       })
       .then((existingPanel) => {
+        // If !exists panel we created a new one
         if (!existingPanel) {
           console.log('NOT existing panel: ' + idCategoria);
 
@@ -228,11 +224,12 @@ function createPanelcategory(
           panelCreates.push(newPanel.name);
           return newPanel.save();
         } else {
-          // console.log('existing panel: ' + idCategoria);
+          // If exists panel, we update latest version of it
+
+          // We find if current gene exists in the panel already
           let existGeneInPanel = existingPanel.genes.find((gene) => {
             return gene._id === geneObject._id;
           });
-          // console.log(JSON.stringify(existingPanel.genes));
 
           if (
             typeof existGeneInPanel === 'undefined' ||
@@ -241,13 +238,11 @@ function createPanelcategory(
             existingPanel.genes.push(geneObject._id);
           }
           // existingPanel.version++;
-          // console.log(JSON.stringify(existingPanel.genes));
           panelUpdates.push(existingPanel.name);
           return Panel.update({_id: existingPanel._id}, existingPanel);
         }
       })
       .then((savePanel) => {
-        // geneSaves.push(count + ': ' + geneResponse.name);
         responsePromise.data = savePanel;
         return responsePromise;
       })
