@@ -3,6 +3,15 @@ const Schema = mongoose.Schema;
 // ================================
 // User Schema
 // ================================
+
+const synonimOmimSubSchema = new Schema(
+  {
+    synonim: {type: String},
+    OMIM: {type: String},
+  },
+  {_id: false}
+);
+
 const PanelSchema = new Schema(
   {
     internalId: {
@@ -13,7 +22,12 @@ const PanelSchema = new Schema(
       type: String,
       required: true,
     },
-    genes: [{type: Schema.Types.ObjectId, ref: 'Gene'}],
+    genes: [
+      {
+        _id: {type: Schema.Types.ObjectId, ref: 'Gene'},
+        extra: [synonimOmimSubSchema],
+      },
+    ],
     variants: [],
     reportText: {
       type: String,

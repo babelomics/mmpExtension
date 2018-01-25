@@ -34,7 +34,7 @@ exports.readFromXls = function(req, res, next) {
     jsonXSLX,
     function(row, callback) {
       count++;
-      // if (count > 2300) {
+      // if (count > 10) {
       //   setImmediate(callback);
       // } else {
       createPanel(row, myMap, count, panelCreates, panelUpdates).then(
@@ -153,6 +153,8 @@ function createPanelcategory(
   panelUpdates
 ) {
   let gene = row.Gen;
+  let synonimRow = row.Sinonimos;
+  let omim = row.OMIM;
 
   // console.log(
   //   count +
@@ -213,7 +215,9 @@ function createPanelcategory(
           console.log('NOT existing panel: ' + idCategoria);
 
           let genes = [];
-          genes.push(geneObject._id);
+          let extra = [{OMIM: omim, synonim: synonimRow}];
+          let geneToAdd = {_id: geneObject._id, extra: extra};
+          genes.push(geneToAdd);
           const newPanel = new Panel({
             internalId: uuid,
             name: categoria,
@@ -227,16 +231,57 @@ function createPanelcategory(
           // If exists panel, we update latest version of it
 
           // We find if current gene exists in the panel already
+          // console.log('EXISTING PANEL:' + existingPanel.name);
           let existGeneInPanel = existingPanel.genes.find((gene) => {
-            return gene._id === geneObject._id;
+            // if (
+            //   geneObject.name === 'IKBKG' &&
+            //   existingPanel.name === 'Anomalías congénitas del desarrollo'
+            // ) {
+            //   console.log(
+            //     'VAMOS' +
+            //       JSON.stringify(gene) +
+            //       ':::' +
+            //       JSON.stringify(geneObject)
+            //   );
+            //   let result = geneObject._id.equals(gene._id);
+            //   console.log(
+            //     'comparando: ' +
+            //       gene._id +
+            //       ' : ' +
+            //       geneObject._id +
+            //       ' : ' +
+            //       result
+            //   );
+            // }
+
+            return geneObject._id.equals(gene._id);
           });
+          // if (
+          //   geneObject.name === 'IKBKG' &&
+          //   existingPanel.name === 'Anomalías congénitas del desarrollo'
+          // ) {
+          //   console.log(existGeneInPanel);
+          //   console.log(JSON.stringify(existingPanel));
+          // }
 
           if (
             typeof existGeneInPanel === 'undefined' ||
             existGeneInPanel === null
           ) {
-            existingPanel.genes.push(geneObject._id);
+            let geneToAdd = {
+              _id: geneObject._id,
+              extra: [{OMIM: omim, synonim: synonimRow}],
+            };
+            existingPanel.genes.push(geneToAdd);
+          } else {
+            existGeneInPanel.extra.push({OMIM: omim, synonim: synonimRow});
           }
+          // if (
+          //   geneObject.name === 'IKBKG' &&
+          //   existingPanel.name === 'Anomalías congénitas del desarrollo'
+          // ) {
+          //   console.log(JSON.stringify(existingPanel));
+          // }
           // existingPanel.version++;
           panelUpdates.push(existingPanel.name);
           return Panel.update({_id: existingPanel._id}, existingPanel);
@@ -293,6 +338,7 @@ exports.searchPanel = function(req, res, next) {
   console.log(query);
 
   Panel.find({$text: {$search: query}})
+    .populate({path: 'genes._id'})
     .limit(limit)
     .exec()
     .then((respnse) => {
