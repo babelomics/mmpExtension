@@ -337,7 +337,17 @@ exports.searchPanel = function(req, res, next) {
 
   console.log(query);
 
-  Panel.find({$text: {$search: query}})
+  // query = '\' + query  \'';
+  // Panel.find(
+  //   {$text: {$search: query, $language: 'none'}},
+  //   {score: {$meta: 'textScore'}}
+  // )
+  Panel.find({
+    name: {
+      $regex: query,
+      $options: 'i',
+    },
+  })
     .populate({path: 'genes._id'})
     .limit(limit)
     .exec()
