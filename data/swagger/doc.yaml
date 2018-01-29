@@ -116,6 +116,22 @@ paths:
         responses:
           200:
             description: "Read gene from xls"
+  /gene/addReferenceFromXls:
+    get:
+        description: "Read genes reference from xls file"
+        tags:
+        - "gene"
+        parameters:
+        - name: "pathFile"
+          description: "Path where is xls file."
+          in: "query"
+          required: true
+          type: "string"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Read gene reference from xls and update gene"
   /ping:
     get:
       description: "Testing Endpoint"

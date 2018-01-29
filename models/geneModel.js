@@ -11,6 +11,9 @@ const GeneSchema = new Schema(
       unique: true,
       required: true,
     },
+    reference: {
+      type: String,
+    },
   },
   {
     timestamps: true,

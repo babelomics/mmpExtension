@@ -186,6 +186,7 @@ function createPanelcategory(
     // console.log('llego2');
     // console.log(myMap);
 
+    gene = gene.trim();
     let geneObject = null;
     // Find gene in bd in the same xls row
     return Gene.findOne({

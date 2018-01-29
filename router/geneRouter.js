@@ -6,4 +6,5 @@ module.exports.init = function(apiRoutes) {
   apiRoutes.use('/gene', geneRoutes);
   geneRoutes.get('/count', GeneController.count);
   geneRoutes.get('/readFromXls', GeneController.readFromXls);
+  geneRoutes.get('/addReferenceFromXls', GeneController.addReferenceFromXls);
 };
