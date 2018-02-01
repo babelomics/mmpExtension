@@ -206,3 +206,33 @@ exports.addReferenceFromXls = function(req, res, next) {
     }
   );
 };
+
+// = =======================================
+// FindByName Route
+// = =======================================
+exports.findByName = function(req, res, next) {
+  let name = req.query.name;
+  Gene.findOne(
+    {
+      name,
+    },
+    (err, existingGene) => {
+      if (err) {
+        res
+          .status(err.status)
+          .json(new ResponseMMP().responseError({message: err.msg}));
+      }
+
+      // If user is not unique, return error
+      if (existingGene) {
+        res.status(200).json(new ResponseMMP().response(existingGene));
+      } else {
+        res.status(200).json(
+          new ResponseMMP().responseError({
+            message: 'Not Exists gene:' + name,
+          })
+        );
+      }
+    }
+  );
+};

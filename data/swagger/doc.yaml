@@ -132,6 +132,22 @@ paths:
         responses:
           200:
             description: "Read gene reference from xls and update gene"
+  /gene/findByName:
+    get:
+        description: "Find genes by name"
+        tags:
+        - "gene"
+        parameters:
+        - name: "name"
+          description: "Gene name to find"
+          in: "query"
+          required: true
+          type: "string"
+        produces:
+        - "application/json"
+        responses:
+          200:
+            description: "Find an exact match with the given name gene."
   /ping:
     get:
       description: "Testing Endpoint"
