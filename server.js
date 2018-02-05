@@ -9,7 +9,7 @@ const app = express();
 
 // Init swagger
 require('./config/swagger').swagger_init(app, express);
-console.log('Swagger Init');
+console.log('MMP Extension Swagger Init');
 
 // Database Connection
 mongoose.connect(config.database);
