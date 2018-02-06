@@ -6,7 +6,6 @@ const Schema = mongoose.Schema;
 
 const synonimOmimSubSchema = new Schema(
   {
-    synonim: {type: String},
     OMIM: {type: String},
   },
   {_id: false}

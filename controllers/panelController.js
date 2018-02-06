@@ -54,7 +54,7 @@ exports.readFromXls = function(req, res, next) {
       if (err && err.break) {
         res
           .status(err.status)
-          .json(new ResponseMMP().responseError({message: err.msg}));
+          .json(new ResponseMMP().responseError({message: err}));
       } else {
         console.log('Terminando');
         let responseData = {
@@ -152,17 +152,15 @@ function createPanelcategory(
   panelCreates,
   panelUpdates
 ) {
-  let gene = row.Gen;
-  let synonimRow = row.Sinonimos;
+  let cellbaseId = row.cellbase_id;
   let omim = row.OMIM;
 
-  // console.log(
-  //   count +
-  //     'llegandoa  createPanelcategory: ' +
-  //     JSON.stringify(row) +
-  //     ':' +
-  //     row.Gen
-  // );
+  console.log(
+    'llegandoa  createPanelcategory: ' +
+      JSON.stringify(row) +
+      ':' +
+      row.cellbase_id
+  );
 
   let responsePromise = {
     break: false,
@@ -174,31 +172,31 @@ function createPanelcategory(
     categoria !== null &&
     categoria !== ''
   ) {
-    // console.log('llego1');
+    console.log('llego1');
     let idCategoria = myMap.get(categoria);
-    // console.log(idCategoria);
+    console.log(idCategoria);
 
     let uuid = uuidv1();
     if (typeof idCategoria === 'undefined' || idCategoria === null) {
       idCategoria = uuid;
       myMap.set(categoria, uuid);
     }
-    // console.log('llego2');
-    // console.log(myMap);
+    console.log('llego2');
+    console.log(myMap);
 
-    gene = gene.trim();
+    cellbaseId = cellbaseId.trim();
     let geneObject = null;
     // Find gene in bd in the same xls row
     return Gene.findOne({
-      name: gene,
+      cellbaseId: cellbaseId,
     })
       .exec()
       .then((existingGene) => {
-        console.log('existing gene: ' + gene);
+        console.log('existing gene: ' + cellbaseId);
         // If !exist gene return error
         if (!existingGene) {
           console.log('Not found gene' + name);
-          responsePromise.msg = 'Not found gene: ' + gene;
+          responsePromise.msg = 'Not found gene: ' + cellbaseId;
           responsePromise.break = true;
           return responsePromise;
         } else {
@@ -216,7 +214,7 @@ function createPanelcategory(
           console.log('NOT existing panel: ' + idCategoria);
 
           let genes = [];
-          let extra = [{OMIM: omim, synonim: synonimRow}];
+          let extra = [{OMIM: omim}];
           let geneToAdd = {_id: geneObject._id, extra: extra};
           genes.push(geneToAdd);
           const newPanel = new Panel({
@@ -232,7 +230,7 @@ function createPanelcategory(
           // If exists panel, we update latest version of it
 
           // We find if current gene exists in the panel already
-          // console.log('EXISTING PANEL:' + existingPanel.name);
+          console.log('EXISTING PANEL:' + existingPanel.name);
           let existGeneInPanel = existingPanel.genes.find((gene) => {
             // if (
             //   geneObject.name === 'IKBKG' &&
@@ -271,11 +269,11 @@ function createPanelcategory(
           ) {
             let geneToAdd = {
               _id: geneObject._id,
-              extra: [{OMIM: omim, synonim: synonimRow}],
+              extra: [{OMIM: omim}],
             };
             existingPanel.genes.push(geneToAdd);
           } else {
-            existGeneInPanel.extra.push({OMIM: omim, synonim: synonimRow});
+            existGeneInPanel.extra.push({OMIM: omim});
           }
           // if (
           //   geneObject.name === 'IKBKG' &&
@@ -293,11 +291,14 @@ function createPanelcategory(
         return responsePromise;
       })
       .catch((error) => {
+        console.log('ERROR:' + error);
         responsePromise.msg = error;
         responsePromise.break = true;
         return responsePromise;
       });
   } else {
+    console.log('NO CATE:');
+
     return responsePromise;
   }
 }
