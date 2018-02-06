@@ -46,48 +46,52 @@ exports.readFromXls = function(req, res, next) {
     jsonXSLX,
     function(row, callback) {
       count++;
-      let name = row.Gen;
+      let cellbaseId = row.cellbase_id;
+      let hgnc = row.HGNC_id;
+
       let err = new Error();
       err.break = true;
-      console.log(count + ': ' + JSON.stringify(row) + ': ' + name);
+      console.log(count + ': ' + JSON.stringify(row) + ': ' + cellbaseId);
 
       // if (count > 5000) {
       //   notSaves.push(count + ': ' + name);
       //   setImmediate(callback);
       // } else {
-      if (!name) {
+      if (!cellbaseId) {
         // Break out of async
         err.status = 422;
         err.msg = 'Gene name is required.';
         return callback(err);
       }
 
-      name = name.trim();
+      cellbaseId = cellbaseId.trim();
       Gene.findOne(
         {
-          name,
+          cellbaseId,
         },
         (err, existingGene) => {
           if (err) {
-            console.log('Error already exists:' + name);
+            console.log('Error already exists:' + cellbaseId);
             setImmediate(callback);
           }
 
-          // If user is not unique, return error
+          //
           if (existingGene) {
-            console.log('already exists:' + name);
-            notSaves.push(count + ': ' + name);
+            console.log('already exists:' + cellbaseId);
+            notSaves.push(count + ': ' + cellbaseId);
             setImmediate(callback);
           } else {
-            // If email is unique and password was provided, create account
+            //
             const gene = new Gene({
-              name,
+              cellbaseId,
+              hgnc: hgnc,
             });
+            console.log('pushing' + JSON.stringify(gene));
             console.log('pushing');
 
             gene.save(function(err, geneResponse) {
               if (!err) {
-                geneSaves.push(count + ': ' + geneResponse.name);
+                geneSaves.push(count + ': ' + geneResponse.cellbaseId);
               }
               callback();
             });
@@ -139,43 +143,43 @@ exports.addReferenceFromXls = function(req, res, next) {
     jsonXSLX,
     function(row, callback) {
       count++;
-      let name = row.Gene;
+      let cellbaseId = row.cellbase_id;
       let err = new Error();
       err.break = true;
-      console.log(count + ': ' + JSON.stringify(row) + ': ' + name);
+      console.log(count + ': ' + JSON.stringify(row) + ': ' + cellbaseId);
 
       // if (count > 5000) {
       //   notSaves.push(count + ': ' + name);
       //   setImmediate(callback);
       // } else {
-      if (!name) {
+      if (!cellbaseId) {
         // Break out of async
         err.status = 422;
         err.msg = 'Gene name is required.';
         return callback(err);
       }
-      name = name.trim();
+      cellbaseId = cellbaseId.trim();
 
       Gene.findOne(
         {
-          name,
+          cellbaseId,
         },
         (err, existingGene) => {
           if (err) {
-            console.log('Error already exists:' + name);
+            console.log('Error already exists:' + cellbaseId);
             setImmediate(callback);
           }
 
           // If user is not unique, return error
           if (existingGene) {
-            existingGene.reference = row.Reference;
-            console.log('already exists:' + name);
+            existingGene.reference = row.RefSeq_id;
+            console.log('already exists:' + cellbaseId);
             Gene.update({_id: existingGene._id}, existingGene, function(
               err,
               geneResponse
             ) {
               if (!err) {
-                updatesGenes.push(geneResponse.name);
+                updatesGenes.push(geneResponse.cellbaseId);
                 callback();
               } else {
                 setImmediate(callback);
@@ -183,7 +187,7 @@ exports.addReferenceFromXls = function(req, res, next) {
             });
           } else {
             // If email is unique and password was provided, create account
-            notUpdatesGenes.push(name);
+            notUpdatesGenes.push(cellbaseId);
             setImmediate(callback);
           }
         }
@@ -214,7 +218,7 @@ exports.findByName = function(req, res, next) {
   let name = req.query.name;
   Gene.findOne(
     {
-      name,
+      $or: [{cellbaseId: name}, {hgnc: name}],
     },
     (err, existingGene) => {
       if (err) {

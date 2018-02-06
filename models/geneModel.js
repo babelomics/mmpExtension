@@ -6,7 +6,12 @@ const Schema = mongoose.Schema;
 // ================================
 const GeneSchema = new Schema(
   {
-    name: {
+    cellbaseId: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    hgnc: {
       type: String,
       unique: true,
       required: true,
@@ -22,6 +27,7 @@ const GeneSchema = new Schema(
 
 // Pre-save of user to database, hash password if password is modified or new
 GeneSchema.pre('save', function(next) {
+  console.log('saving: ' + this.name);
   next();
 });
 
