@@ -179,7 +179,7 @@ exports.addReferenceFromXls = function(req, res, next) {
               geneResponse
             ) {
               if (!err) {
-                updatesGenes.push(geneResponse.cellbaseId);
+                updatesGenes.push(cellbaseId);
                 callback();
               } else {
                 setImmediate(callback);
@@ -203,7 +203,7 @@ exports.addReferenceFromXls = function(req, res, next) {
         console.log('Terminando');
         let responseData = {
           saves: updatesGenes,
-          notSaves: updatesGenes,
+          notSaves: notUpdatesGenes,
         };
         res.status(200).json(new ResponseMMP().response(responseData));
       }
